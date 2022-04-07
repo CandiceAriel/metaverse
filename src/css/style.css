@@ -1,0 +1,21 @@
+.about_canvas_container,
+.home_canvas_container{
+    display: block;
+    z-index: -1;
+}
+
+.about_content,
+.home_content{
+  width: 100%;
+  height: 100%;
+  z-index: 1000;
+  background-color: black;
+}
+
+.about_content h1,
+.home_content h1{
+    color: white;
+    position: absolute;
+    top: 2em;
+    left: 2em;
+}

@@ -1,7 +1,9 @@
 <template>
   <nav>
-    <router-link to="/">Home</router-link> |
-    <router-link to="/about">About</router-link>
+    <a :href="$router.resolve({ name: 'home' }).href" class="nav-menu">Home</a>
+    <a :href="$router.resolve({ name: 'about' }).href" class="nav-menu"
+      >About</a
+    >
   </nav>
   <router-view />
 </template>
@@ -26,5 +28,14 @@ nav {
       color: #42b983;
     }
   }
+
+  .nav-menu :active {
+    color: #42b983;
+  }
+}
+
+body{
+  margin: 0; 
+  height: 100vh;
 }
 </style>
