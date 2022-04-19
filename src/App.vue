@@ -34,8 +34,8 @@ nav {
   }
 }
 
-body{
-  margin: 0; 
+body {
+  margin: 0;
   height: 100vh;
 }
 </style>
