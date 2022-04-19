@@ -194,7 +194,7 @@ function init() {
       mouseIsDown = true;
       setTimeout(function () {
         if (mouseIsDown) {
-          lockctrl.lock();
+          control.lock();
           console.log("hold");
         }
       }, 7000);
