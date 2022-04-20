@@ -23,12 +23,14 @@ let windowHalfX = window.innerWidth / 2;
 let windowHalfY = window.innerHeight / 2;
 let xSpeed = 0.5;
 let zSpeed = 0.5;
+let rSpeed = 1.5;
 
 /* global _ */
 let moveBackward = false;
 let moveForward = false;
 let moveLeft = false;
 let moveRight = false;
+let rotated = false;
 
 let delta;
 
@@ -42,8 +44,7 @@ function init() {
     1000
   );
   camera.position.x += (mouseX - camera.position.x) * 0.05;
-  camera.position.y += (mouseY - camera.position.x) * 0.05;
-  // camera.position.z = 50;
+  camera.position.y += (mouseX - camera.position.x) * 0.05;
 
   clock = new Clock();
   control = new PointerLockControls(camera, render.domElement);
@@ -115,7 +116,7 @@ function init() {
         scene.add(bathroomModel);
         bathroomModel.position.x = cube.position.x + 10;
         bathroomModel.position.y = blockPlane.position.y + 1;
-        bathroomModel.position.z = cube.position.z - 7;
+        bathroomModel.position.z = camera.position.z - 10;
         bathroomModel.scale.set(0.04, 0.04, 0.04);
         bathroomModel.rotateY(Math.PI / 2);
         //bathroomModel.rotateX( Math.PI / 1);
@@ -171,14 +172,12 @@ function init() {
     // cube.position.set (0, -1, -1.5);
 
     cube.position.x = 0;
-    cube.position.y = blockPlane.position.y + 4;
-    cube.position.z = camera.position.z - 1;
-
-    console.log(cube.position);
+    cube.position.y = blockPlane.position.y + 3;
+    cube.position.z = camera.position.z - 1.5;
   }
 
   function createFloor() {
-    let pos = { x: 0, y: -5, z: 3 };
+    let pos = { x: 0, y: -4, z: 3 };
     let scale = { x: 100, y: 2, z: 100 };
 
     blockPlane = new THREE.Mesh(
@@ -207,6 +206,7 @@ function init() {
       console.log("click");
     }
   });
+
 
   //Controls
   orbitctrl =	new OrbitControls( camera, renderer.domElement );
@@ -255,11 +255,9 @@ function onDocumentKeyDown(event) {
 
   // 87 = 'W'; 83 = 'S'; 65 = 'A'; 68 = 'D'
   if (keyCode == 87) {
-    camera.position.z -= zSpeed;
+    cube.position.z -= zSpeed;
     control.moveForward(speed);
     orbitctrl.moveForward = true;
-
-    console.log(cube.position)
   } else if (keyCode == 83) {
     cube.position.z += zSpeed;
     control.moveForward(-speed);
@@ -278,7 +276,7 @@ function onDocumentKeyDown(event) {
     orbitctrl.moveRight = true;
     //directionOffset = Math.PI / 2; //d
 
-    console.log(cube.position)
+    //console.log(cube.position)
   } else if (keyCode == 81){
     cube.position.x -= xSpeed - camera.position.z;
     camera.rotateY (Math.PI / 2) //a
@@ -292,8 +290,6 @@ function onDocumentKeyDown(event) {
 
   mouseX = (event.clientX - windowHalfX) / 2;
   mouseY = (event.clientY - windowHalfY) / 2;
-
-  console.log(camera.position)
 }
 
 function onKeyUp(event) {
