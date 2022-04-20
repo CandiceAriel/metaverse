@@ -7,6 +7,7 @@ import { OrbitControls } from "../../public/js/OrbitControls.js";
 import { Clock } from "../../public/js/Clock.js";
 
 const homecontainer = document.getElementsByClassName("home_canvas_container");
+const btnLock = document.getElementsByClassName("btn_lock");
 console.log(homecontainer);
 
 let camera, scene, renderer;
@@ -71,7 +72,7 @@ function init() {
   renderer.setSize(window.innerWidth, window.innerHeight);
   // renderer.setAnimationLoop(animation);
 
-  //CHECK IF CANVAS CONTAINER RENDERED
+  //CHECK IF ELEMENTS CONTAINER RENDERED
   //ADD RENDERE TO CANVAS
   function checkCanvas() {
     if (homecontainer.length > 0) {
@@ -79,6 +80,17 @@ function init() {
       //domEl = renderer.domElement;
     } else {
       setTimeout(checkCanvas, 1000);
+    }
+  }
+
+  function checkButton() {
+    if (btnLock.length > 0) {
+      btnLock[0].addEventListener('click', () => {
+        console.log("clicked");
+        control.lock();
+    })
+    } else {
+      setTimeout(checkButton, 1000);
     }
   }
 
@@ -191,25 +203,10 @@ function init() {
     scene.add(blockPlane);
   }
 
-  $("div").on("mousedown mouseup", function mouseState(e) {
-    if (e.type == "mousedown") {
-      //code triggers on hold
-      mouseIsDown = true;
-      setTimeout(function () {
-        if (mouseIsDown) {
-          control.lock();
-          console.log("hold");
-        }
-      }, 7000);
-    } else if (e.type == "mouseup") {
-      mouseIsDown = false;
-      console.log("click");
-    }
-  });
-
 
   //Controls
   orbitctrl =	new OrbitControls( camera, renderer.domElement );
+  //orbitctrl.target.set( 0, 50, 0 );
   orbitctrl.update();
 
   function addObj() {
@@ -220,19 +217,19 @@ function init() {
   }
 
   checkCanvas();
+  checkButton();
   addObj();
 }
 //
 var render = function () {
-  
-  const delta = clock.getDelta();
-
-  //rener scene and camera
+  //render scene and camera
   renderer.render(scene, camera);
 };
 
 var animate = function () {
   requestAnimationFrame(animate);
+  const delta = clock.getDelta();
+  onDocumentKeyDown(delta);
   render();
 }
 
@@ -255,28 +252,21 @@ function onDocumentKeyDown(event) {
 
   // 87 = 'W'; 83 = 'S'; 65 = 'A'; 68 = 'D'
   if (keyCode == 87) {
-    cube.position.z -= zSpeed;
+    //cube.position.z -= zSpeed;
     control.moveForward(speed);
-    orbitctrl.moveForward = true;
+    //orbitctrl.moveForward(camSpeed);
   } else if (keyCode == 83) {
-    cube.position.z += zSpeed;
+    //cube.position.z += zSpeed;
     control.moveForward(-speed);
-    orbitctrl.moveBackward = true;
-
-    console.log(cube.position)
+    //orbitctrl.moveBackward = true;
   } else if (keyCode == 65) {
-    cube.position.x -= xSpeed ;
+    //cube.position.x -= xSpeed ;
     control.moveRight(-speed);
-    orbitctrl.moveLeft = true;
-
-    console.log(cube.position)
+    //orbitctrl.moveLeft = true;
   } else if (keyCode == 68) {
-    cube.position.x += xSpeed;
+    //cube.position.x += xSpeed;
     control.moveRight(speed);
-    orbitctrl.moveRight = true;
-    //directionOffset = Math.PI / 2; //d
-
-    //console.log(cube.position)
+    //orbitctrl.moveRight = true;
   } else if (keyCode == 81){
     cube.position.x -= xSpeed - camera.position.z;
     camera.rotateY (Math.PI / 2) //a

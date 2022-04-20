@@ -3,7 +3,7 @@
     <div class="container" id="homeContainer">
       <div class="home_canvas_container"></div>
       <div class="home_content">
-        <h1>Hello</h1>
+        <button class="btn_lock">Pointer Lock</button>
       </div>
     </div>
   </div>
