@@ -3,6 +3,7 @@ import * as THREE from "three";
 import { OBJLoader } from "../../public/js/obj.js";
 import { MTLLoader } from "../../public/js/mtl.js";
 import { PointerLockControls } from "../../public/js/PointerLockControls.js";
+import { OrbitControls } from "../../public/js/OrbitControls.js";
 import { Clock } from "../../public/js/Clock.js";
 
 const homecontainer = document.getElementsByClassName("home_canvas_container");
@@ -10,7 +11,7 @@ console.log(homecontainer);
 
 let camera, scene, renderer;
 let ambientLight, pointLight;
-let clock, control;
+let clock, control, orbitctrl;
 
 let bathroomModel, bathroomMtl, bathroomMtl2;
 let cube, blockPlane;
@@ -60,6 +61,7 @@ function init() {
   pointLight = new THREE.PointLight(0xffffff, 0.8);
   camera.add(pointLight);
   scene.add(camera);
+  console.log(camera.position)
 
   //RENDERER
   renderer = new THREE.WebGLRenderer({
@@ -161,7 +163,7 @@ function init() {
   }
 
   function addCube() {
-    const geometry = new THREE.BoxGeometry(0.2, 0.2, 0.2);
+    const geometry = new THREE.ConeGeometry( 0.05, 0.5 );
     const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
     cube = new THREE.Mesh(geometry, material);
     scene.add(cube);
@@ -169,8 +171,10 @@ function init() {
     // cube.position.set (0, -1, -1.5);
 
     cube.position.x = 0;
-    cube.position.y = -0.9;
-    cube.position.z = -1.2;
+    cube.position.y = blockPlane.position.y + 4;
+    cube.position.z = camera.position.z - 1;
+
+    console.log(cube.position);
   }
 
   function createFloor() {
@@ -204,6 +208,10 @@ function init() {
     }
   });
 
+  //Controls
+  orbitctrl =	new OrbitControls( camera, renderer.domElement );
+  orbitctrl.update();
+
   function addObj() {
     createFloor();
     loadMaterial();
@@ -211,19 +219,22 @@ function init() {
     addCube();
   }
 
-  document.addEventListener("keydown", onDocumentKeyDown);
-  document.addEventListener("keyup", onKeyUp);
-
   checkCanvas();
   addObj();
 }
 //
 var render = function () {
-  requestAnimationFrame(render);
+  
+  const delta = clock.getDelta();
 
   //rener scene and camera
   renderer.render(scene, camera);
 };
+
+var animate = function () {
+  requestAnimationFrame(animate);
+  render();
+}
 
 //--------
 //EVENT HANDLERS
@@ -244,29 +255,45 @@ function onDocumentKeyDown(event) {
 
   // 87 = 'W'; 83 = 'S'; 65 = 'A'; 68 = 'D'
   if (keyCode == 87) {
-    cube.position.z -= zSpeed;
+    camera.position.z -= zSpeed;
     control.moveForward(speed);
-    moveForward = true;
+    orbitctrl.moveForward = true;
+
+    console.log(cube.position)
   } else if (keyCode == 83) {
     cube.position.z += zSpeed;
     control.moveForward(-speed);
-    moveBackward = true;
+    orbitctrl.moveBackward = true;
+
+    console.log(cube.position)
   } else if (keyCode == 65) {
-    cube.position.x -= xSpeed;
+    cube.position.x -= xSpeed ;
     control.moveRight(-speed);
-    moveLeft = true;
-    //directionOffset = Math.PI / 2; //a
+    orbitctrl.moveLeft = true;
+
+    console.log(cube.position)
   } else if (keyCode == 68) {
     cube.position.x += xSpeed;
     control.moveRight(speed);
-    moveRight = true;
+    orbitctrl.moveRight = true;
     //directionOffset = Math.PI / 2; //d
-  } else if (keyCode == 32) {
-    cube.position.set(0, 0, 0);
+
+    console.log(cube.position)
+  } else if (keyCode == 81){
+    cube.position.x -= xSpeed - camera.position.z;
+    camera.rotateY (Math.PI / 2) //a
+  }else if (keyCode == 69){
+    cube.position.x -= xSpeed - camera.position.z;
+    camera.rotateY (Math.PI / -2) //a
+  }else if (keyCode == 32) {
+    cube.position.set(0, -1, camera.position.z - 1);
+    camera.position.set(0, 0, 0);
   }
 
   mouseX = (event.clientX - windowHalfX) / 2;
   mouseY = (event.clientY - windowHalfY) / 2;
+
+  console.log(camera.position)
 }
 
 function onKeyUp(event) {
@@ -274,18 +301,20 @@ function onKeyUp(event) {
 
   // 87 = 'W'; 83 = 'S'; 65 = 'A'; 68 = 'D'
   if (keyCode == 87) {
-    moveForward = false;
+    orbitctrl.moveForward = false;
   } else if (keyCode == 83) {
-    moveBackward = false;
+    orbitctrl.moveBackward = false;
   } else if (keyCode == 65) {
-    moveLeft = false;
+    orbitctrl.moveLeft = false;
   } else if (keyCode == 68) {
-    moveRight = false;
+    orbitctrl.moveRight = false;
   }
 }
 
 // run functions
 init();
-render();
+animate();
 
 window.addEventListener("resize", onWindowResize);
+document.addEventListener("keydown", onDocumentKeyDown);
+document.addEventListener("keyup", onKeyUp);
