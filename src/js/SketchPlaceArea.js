@@ -1,0 +1,141 @@
+import * as THREE from "three";
+
+import { OBJLoader } from "../../public/js/obj.js";
+import { MTLLoader } from "../../public/js/mtl.js";
+import { PointerLockControls } from "../../public/js/PointerLockControls.js";
+import { Clock } from "../../public/js/Clock.js";
+
+const homecontainer = document.getElementsByClassName("sketch_canvas_container");
+console.log(homecontainer);
+
+var camera, scene, renderer, mesh, goal, keys, follow;
+let bathroomModel, bathroomMtl, bathroomMtl2;
+
+var time = 0;
+var newPosition = new THREE.Vector3();
+var matrix = new THREE.Matrix4();
+
+var stop = 1;
+var DEGTORAD = 0.01745327;
+var temp = new THREE.Vector3;
+var dir = new THREE.Vector3;
+var a = new THREE.Vector3;
+var b = new THREE.Vector3;
+var coronaSafetyDistance = 0.3;
+var velocity = 0.0;
+var speed = 0.0;
+
+var delta;
+
+function init() {
+  camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 10 );
+  camera.position.set( 0, .16, 0 );
+
+  scene = new THREE.Scene();
+  camera.lookAt( scene.position );
+
+  var geometry = new THREE.BoxBufferGeometry( 0.2, 0.2, 0.2 );
+  var material = new THREE.MeshNormalMaterial();
+
+  mesh = new THREE.Mesh( geometry, material );
+  mesh.position.y = 0.1;
+
+  goal = new THREE.Object3D;
+  follow = new THREE.Object3D;
+  follow.position.z = -coronaSafetyDistance;
+  mesh.add( follow );
+
+  goal.add( camera );
+  scene.add( mesh );
+
+  // FLOOR
+  var gridHelper = new THREE.GridHelper( 40, 40 );
+  scene.add( gridHelper );
+
+  // const floorGeometry = new THREE.PlaneGeometry( 40, 40 );
+  // const floorMaterial = new THREE.MeshBasicMaterial( {color: 0xffffff, side: THREE.DoubleSide} );
+  // const floor = new THREE.Mesh( floorGeometry, floorMaterial );
+  // floor.position.y = 0.0;
+	// floor.rotation.x = - Math.PI / 2;
+  // scene.add( floor );
+  // END FLOOR
+
+  renderer = new THREE.WebGLRenderer( { antialias: true } );
+  renderer.setSize( window.innerWidth, window.innerHeight );
+  document.body.appendChild( renderer.domElement );
+
+  keys = {
+    a: false,
+    s: false,
+    d: false,
+    w: false
+  };
+
+  document.body.addEventListener( 'keydown', function(e) {
+
+    const key = e.code.replace('Key', '').toLowerCase();
+    if ( keys[ key ] !== undefined )
+      keys[ key ] = true;
+
+  });
+  document.body.addEventListener( 'keyup', function(e) {
+
+    const key = e.code.replace('Key', '').toLowerCase();
+    if ( keys[ key ] !== undefined )
+      keys[ key ] = false;
+
+  });
+  
+}
+//
+
+function animate() {
+
+  requestAnimationFrame( animate );
+
+  speed = 0.0;
+
+  if ( keys.w )
+    speed = 0.02;
+  else if ( keys.s )
+    speed = -0.02;
+
+  velocity += ( speed - velocity ) * .3;
+  mesh.translateZ( velocity );
+
+  if ( keys.a )
+    mesh.rotateY(0.03);
+  else if ( keys.d )
+    mesh.rotateY(-0.03);
+
+
+  a.lerp(mesh.position, 0.4);
+  b.copy(goal.position);
+
+  dir.copy( a ).sub( b ).normalize();
+  const dis = a.distanceTo( b ) - coronaSafetyDistance;
+  goal.position.addScaledVector( dir, dis );
+  goal.position.lerp(temp, 0.06);
+  temp.setFromMatrixPosition(follow.matrixWorld);
+
+  camera.lookAt( mesh.position );
+
+  renderer.render( scene, camera );
+
+}
+
+function onWindowResize() {
+  const canvasWidth = window.innerWidth;
+  const canvasHeight = window.innerHeight;
+
+  renderer.setSize(canvasWidth, canvasHeight);
+
+  camera.aspect = canvasWidth / canvasHeight;
+  camera.updateProjectionMatrix();
+}
+
+// run functions
+init();
+animate();
+
+window.addEventListener("resize", onWindowResize);

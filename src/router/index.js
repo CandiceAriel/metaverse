@@ -1,11 +1,17 @@
 import { createRouter, createWebHistory } from "vue-router";
 import HomeView from "../views/HomeView.vue";
+import SketchView from "../views/SketchView.vue";
 
 const routes = [
   {
     path: "/",
     name: "home",
     component: HomeView,
+  },
+  {
+    path: "/sketch",
+    name: "sketchArea",
+    component: SketchView,
   },
   {
     path: "/about",
