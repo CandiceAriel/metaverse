@@ -26,12 +26,6 @@ let xSpeed = 0.5;
 let zSpeed = 0.5;
 let rSpeed = 1.5;
 
-/* global _ */
-let moveBackward = false;
-let moveForward = false;
-let moveLeft = false;
-let moveRight = false;
-let rotated = false;
 
 let delta;
 

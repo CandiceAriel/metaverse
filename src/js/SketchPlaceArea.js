@@ -3,12 +3,20 @@ import * as THREE from "three";
 import { OBJLoader } from "../../public/js/obj.js";
 import { MTLLoader } from "../../public/js/mtl.js";
 import { PointerLockControls } from "../../public/js/PointerLockControls.js";
-import { Clock } from "../../public/js/Clock.js";
+import { render } from "vue";
 
-const homecontainer = document.getElementsByClassName("sketch_canvas_container");
-console.log(homecontainer);
+const sketchcontainer = document.getElementsByClassName("sketch_canvas_container");
+const btnLock = document.getElementsByClassName("btn_lock");
 
-var camera, scene, renderer, mesh, goal, keys, follow;
+$( document ).ready(function() {
+  $(".icon__close").click(function(ev){
+    $(".desktop-help").hide();
+    console.log('icon clicked');
+  })
+});
+
+var camera, scene, renderer, mesh, goal, keys, follow, mesh, ctrl;
+let ambientLight, pointLight;
 let bathroomModel, bathroomMtl, bathroomMtl2;
 
 var time = 0;
@@ -24,29 +32,93 @@ var b = new THREE.Vector3;
 var coronaSafetyDistance = 0.3;
 var velocity = 0.0;
 var speed = 0.0;
+let mouseX = 0,
+  mouseY = 0;
 
 var delta;
 
 function init() {
-  camera = new THREE.PerspectiveCamera( 70, window.innerWidth / window.innerHeight, 0.01, 10 );
-  camera.position.set( 0, .16, 0 );
+  camera = new THREE.PerspectiveCamera( 100, window.innerWidth / window.innerHeight, 0.5, 1000 );
+  //camera.position.set( 0, 0, 0 );
+  camera.position.x += (mouseX - camera.position.x) * 0.05;
+  camera.position.y = 1;
 
   scene = new THREE.Scene();
-  camera.lookAt( scene.position );
+  scene.background = new THREE.Color("lightgray");
 
-  var geometry = new THREE.BoxBufferGeometry( 0.2, 0.2, 0.2 );
-  var material = new THREE.MeshNormalMaterial();
+  ambientLight = new THREE.AmbientLight(0xcccccc, 0.4);
+  scene.add(ambientLight);
 
-  mesh = new THREE.Mesh( geometry, material );
-  mesh.position.y = 0.1;
+  //add point light
+  pointLight = new THREE.PointLight(0xffffff, 0.8);
+  camera.add(pointLight);
+  //camera.lookAt( scene.position );
 
-  goal = new THREE.Object3D;
-  follow = new THREE.Object3D;
-  follow.position.z = -coronaSafetyDistance;
-  mesh.add( follow );
+  ctrl = new PointerLockControls(camera, render.domElement);
 
-  goal.add( camera );
-  scene.add( mesh );
+  function addCube(){
+    var geometry = new THREE.BoxBufferGeometry( 0.2, 0.2, 0.2 );
+    var material = new THREE.MeshNormalMaterial();
+
+    mesh = new THREE.Mesh( geometry, material );
+    mesh.position.y = 0;
+    mesh.position.z = camera.position.z - 2;
+
+    goal = new THREE.Object3D;
+    follow = new THREE.Object3D;
+    follow.position.z = -coronaSafetyDistance;
+    mesh.add(camera);
+    mesh.add( follow );
+
+    goal.add( camera );
+    scene.add( mesh );
+  }
+
+  const onProgress = function (xhr) {
+    if (xhr.lengthComputable) {
+      const percentComplete = (xhr.loaded / xhr.total) * 100;
+      console.log(Math.round(percentComplete, 2) + "% downloaded");
+    }
+  };
+
+  const mtlLoader = new MTLLoader();
+  function loadMaterial() {
+    mtlLoader.load("model/mtl/3d-model.mtl", function (materials) {
+      materials.preload();
+      bathroomMtl = materials;
+      loadModel(bathroomMtl);
+    });
+  }
+
+  // load model
+  // X cord : left and right
+  const objLoader = new OBJLoader();
+  function loadModel(bathroomMtl) {
+    objLoader.setMaterials(bathroomMtl);
+    objLoader.load(
+      "model/obj/3d-model.obj",
+      (object) => {
+        // (object.children[0] as THREE.Mesh).material = material
+        // object.traverse(function (child) {
+        //     if ((child as THREE.Mesh).isMesh) {
+        //         (child as THREE.Mesh).material = material
+        //     }
+        // })
+        bathroomModel = object;
+        scene.add(bathroomModel);
+        bathroomModel.position.x = mesh.position.x + 5;
+        bathroomModel.position.y = mesh.position.y - 0.5;
+        bathroomModel.position.z = camera.position.z - 10;
+        bathroomModel.scale.set(0.04, 0.04, 0.04);
+        bathroomModel.rotateY(Math.PI / 2);
+        //bathroomModel.rotateX( Math.PI / 1);
+      },
+      onProgress,
+      (error) => {
+        console.log(error);
+      }
+    );
+  }
 
   // FLOOR
   var gridHelper = new THREE.GridHelper( 40, 40 );
@@ -62,7 +134,14 @@ function init() {
 
   renderer = new THREE.WebGLRenderer( { antialias: true } );
   renderer.setSize( window.innerWidth, window.innerHeight );
-  document.body.appendChild( renderer.domElement );
+
+  function checkCanvas() {
+    if (sketchcontainer.length > 0) {
+      sketchcontainer[0].appendChild(renderer.domElement);
+    } else {
+      setTimeout(checkCanvas, 1000);
+    }
+  }
 
   keys = {
     a: false,
@@ -85,7 +164,24 @@ function init() {
       keys[ key ] = false;
 
   });
-  
+
+  renderer.render( scene, camera );
+
+  function checkButton() {
+    if (btnLock.length > 0) {
+      btnLock[0].addEventListener('click', () => {
+        console.log("clicked");
+        ctrl.lock();
+    })
+    } else {
+      setTimeout(checkButton, 1000);
+    }
+  }
+
+  checkCanvas();
+  checkButton();
+  addCube();
+  loadMaterial();
 }
 //
 
@@ -96,19 +192,20 @@ function animate() {
   speed = 0.0;
 
   if ( keys.w )
-    speed = 0.02;
-  else if ( keys.s )
     speed = -0.02;
+  else if ( keys.s )
+    speed = 0.02;
 
   velocity += ( speed - velocity ) * .3;
   mesh.translateZ( velocity );
 
-  if ( keys.a )
+  if ( keys.a ){
     mesh.rotateY(0.03);
-  else if ( keys.d )
+  }else if ( keys.d ){
     mesh.rotateY(-0.03);
-
-
+  }
+  
+ 
   a.lerp(mesh.position, 0.4);
   b.copy(goal.position);
 
@@ -118,7 +215,7 @@ function animate() {
   goal.position.lerp(temp, 0.06);
   temp.setFromMatrixPosition(follow.matrixWorld);
 
-  camera.lookAt( mesh.position );
+  //camera.lookAt( mesh.position );
 
   renderer.render( scene, camera );
 

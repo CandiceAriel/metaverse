@@ -18,5 +18,5 @@ export default {
 
 import "../js/About.js";
 import "../../public/js/obj.js";
-import "../css/style.css";
+import "../css/style.scss";
 </script>

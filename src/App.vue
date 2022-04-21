@@ -1,9 +1,7 @@
 <template>
   <nav>
     <a :href="$router.resolve({ name: 'home' }).href" class="nav-menu">Home</a>
-    <a :href="$router.resolve({ name: 'about' }).href" class="nav-menu"
-      >About</a
-    >
+     <a :href="$router.resolve({ name: 'sketchArea' }).href" class="nav-menu">Sketch</a>
   </nav>
   <router-view />
 </template>
