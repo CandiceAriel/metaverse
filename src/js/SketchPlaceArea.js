@@ -6,16 +6,9 @@ import { PointerLockControls } from "../../public/js/PointerLockControls.js";
 import { render } from "vue";
 
 const sketchcontainer = document.getElementsByClassName("sketch_canvas_container");
-const btnLock = document.getElementsByClassName("btn_lock");
+const btnLockSketch = document.getElementsByClassName("sketch_btn_lock");
 
-$( document ).ready(function() {
-  $(".icon__close").click(function(ev){
-    $(".desktop-help").hide();
-    console.log('icon clicked');
-  })
-});
-
-var camera, scene, renderer, mesh, goal, keys, follow, mesh, ctrl;
+var camera, scene, renderer, mesh, goal, keys, follow, ctrl;
 let ambientLight, pointLight;
 let bathroomModel, bathroomMtl, bathroomMtl2;
 
@@ -41,20 +34,20 @@ function init() {
   camera = new THREE.PerspectiveCamera( 100, window.innerWidth / window.innerHeight, 0.5, 1000 );
   //camera.position.set( 0, 0, 0 );
   camera.position.x += (mouseX - camera.position.x) * 0.05;
-  camera.position.y = 1;
+  camera.position.y = 0.16;
+  camera.position.z = 1;
 
   scene = new THREE.Scene();
   scene.background = new THREE.Color("lightgray");
 
   ambientLight = new THREE.AmbientLight(0xcccccc, 0.4);
   scene.add(ambientLight);
+  scene.add(camera);
 
   //add point light
   pointLight = new THREE.PointLight(0xffffff, 0.8);
   camera.add(pointLight);
   //camera.lookAt( scene.position );
-
-  ctrl = new PointerLockControls(camera, render.domElement);
 
   function addCube(){
     var geometry = new THREE.BoxBufferGeometry( 0.2, 0.2, 0.2 );
@@ -135,6 +128,8 @@ function init() {
   renderer = new THREE.WebGLRenderer( { antialias: true } );
   renderer.setSize( window.innerWidth, window.innerHeight );
 
+  ctrl = new PointerLockControls(camera, renderer.domElement);
+
   function checkCanvas() {
     if (sketchcontainer.length > 0) {
       sketchcontainer[0].appendChild(renderer.domElement);
@@ -168,8 +163,8 @@ function init() {
   renderer.render( scene, camera );
 
   function checkButton() {
-    if (btnLock.length > 0) {
-      btnLock[0].addEventListener('click', () => {
+    if (btnLockSketch.length > 0) {
+      btnLockSketch[0].addEventListener('click', () => {
         console.log("clicked");
         ctrl.lock();
     })
@@ -215,7 +210,7 @@ function animate() {
   goal.position.lerp(temp, 0.06);
   temp.setFromMatrixPosition(follow.matrixWorld);
 
-  //camera.lookAt( mesh.position );
+  camera.lookAt( mesh.position );
 
   renderer.render( scene, camera );
 

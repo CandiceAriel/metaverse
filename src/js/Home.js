@@ -8,9 +8,16 @@ import { Clock } from "../../public/js/Clock.js";
 
 const homecontainer = document.getElementsByClassName("home_canvas_container");
 const btnLock = document.getElementsByClassName("btn_lock");
-console.log(homecontainer);
 
-let camera, scene, renderer;
+$( document ).ready(function() {
+  $(".icon__close").click(function(ev){
+    $(".desktop-help").hide();
+    console.log('icon clicked');
+  })
+});
+
+
+let camera, scene, renderer,mesh, goal, keys, follow;
 let ambientLight, pointLight;
 let clock, control, orbitctrl;
 
@@ -26,9 +33,26 @@ let xSpeed = 0.5;
 let zSpeed = 0.5;
 let rSpeed = 1.5;
 
+let moveForward = false;
+let moveBackward = false;
+let rotateRight = false;
+let rotateLeft = false;
 
-let delta;
+// var time = 0;
+// var newPosition = new THREE.Vector3();
+// var matrix = new THREE.Matrix4();
 
+// var stop = 1;
+// var DEGTORAD = 0.01745327;
+// var temp = new THREE.Vector3;
+// var dir = new THREE.Vector3;
+// var a = new THREE.Vector3;
+// var b = new THREE.Vector3;
+// var coronaSafetyDistance = 0.3;
+// var velocity = 0.0;
+// var speed = 0.0;
+
+//initialize
 function init() {
   //ADD CAMERA
   //camera = new THREE.PerspectiveCamera( 90, window.innerWidth / window.innerHeight, 1, 500 );
@@ -39,7 +63,8 @@ function init() {
     1000
   );
   camera.position.x += (mouseX - camera.position.x) * 0.05;
-  camera.position.y += (mouseX - camera.position.x) * 0.05;
+  camera.position.x += (mouseX - camera.position.x) * 0.05;
+  //camera.position.z = -10;
 
   clock = new Clock();
   control = new PointerLockControls(camera, render.domElement);
@@ -173,13 +198,20 @@ function init() {
     const geometry = new THREE.ConeGeometry( 0.05, 0.5 );
     const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
     cube = new THREE.Mesh(geometry, material);
-    scene.add(cube);
-    // camera.add(cube);
-    // cube.position.set (0, -1, -1.5);
+    //scene.add(cube);
 
     cube.position.x = 0;
     cube.position.y = blockPlane.position.y + 3;
-    cube.position.z = camera.position.z - 1.5;
+    cube.position.z = camera.position.z;
+
+    // goal = new THREE.Object3D;
+    // follow = new THREE.Object3D;
+    // follow.position.z = -coronaSafetyDistance;
+    // cube.add(camera);
+    // cube.add( follow );
+
+    // goal.add( camera );
+    scene.add( cube );
   }
 
   function createFloor() {
@@ -197,12 +229,6 @@ function init() {
     scene.add(blockPlane);
   }
 
-
-  //Controls
-  orbitctrl =	new OrbitControls( camera, renderer.domElement );
-  //orbitctrl.target.set( 0, 50, 0 );
-  orbitctrl.update();
-
   function addObj() {
     createFloor();
     loadMaterial();
@@ -213,6 +239,9 @@ function init() {
   checkCanvas();
   checkButton();
   addObj();
+
+  document.addEventListener("keydown", onDocumentKeyDown);
+  document.addEventListener("keyup", onKeyUp);
 }
 //
 var render = function () {
@@ -222,8 +251,8 @@ var render = function () {
 
 var animate = function () {
   requestAnimationFrame(animate);
-  const delta = clock.getDelta();
-  onDocumentKeyDown(delta);
+  
+  
   render();
 }
 
@@ -248,24 +277,21 @@ function onDocumentKeyDown(event) {
   if (keyCode == 87) {
     //cube.position.z -= zSpeed;
     control.moveForward(speed);
-    //orbitctrl.moveForward(camSpeed);
+    moveForward = true;
   } else if (keyCode == 83) {
     //cube.position.z += zSpeed;
     control.moveForward(-speed);
-    //orbitctrl.moveBackward = true;
   } else if (keyCode == 65) {
     //cube.position.x -= xSpeed ;
     control.moveRight(-speed);
-    //orbitctrl.moveLeft = true;
   } else if (keyCode == 68) {
     //cube.position.x += xSpeed;
     control.moveRight(speed);
-    //orbitctrl.moveRight = true;
   } else if (keyCode == 81){
-    cube.position.x -= xSpeed - camera.position.z;
+    //cube.position.x -= xSpeed - camera.position.z;
     camera.rotateY (Math.PI / 2) //a
   }else if (keyCode == 69){
-    cube.position.x -= xSpeed - camera.position.z;
+    //cube.position.x -= xSpeed - camera.position.z;
     camera.rotateY (Math.PI / -2) //a
   }else if (keyCode == 32) {
     cube.position.set(0, -1, camera.position.z - 1);
@@ -281,13 +307,13 @@ function onKeyUp(event) {
 
   // 87 = 'W'; 83 = 'S'; 65 = 'A'; 68 = 'D'
   if (keyCode == 87) {
-    orbitctrl.moveForward = false;
+    moveForward = false;
   } else if (keyCode == 83) {
-    orbitctrl.moveBackward = false;
+    moveBackward = false;
   } else if (keyCode == 65) {
-    orbitctrl.moveLeft = false;
+    rotateLeft = false;
   } else if (keyCode == 68) {
-    orbitctrl.moveRight = false;
+    rotateRight = false;
   }
 }
 
@@ -296,5 +322,4 @@ init();
 animate();
 
 window.addEventListener("resize", onWindowResize);
-document.addEventListener("keydown", onDocumentKeyDown);
-document.addEventListener("keyup", onKeyUp);
+

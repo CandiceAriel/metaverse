@@ -18,7 +18,8 @@
   background-color: transparent;
 }
 
-.btn_lock{
+.btn_lock,
+.sketch_btn_lock{
   position: absolute;
   top: 5em;
   left: 2em;
@@ -37,16 +38,17 @@
   left: 34%;
   padding: 10px;
 
-  &__header {
+    &__header {
 
-    height: 50px;
-
-    h2{
-      float: left;
-      text-align: center;
+      height: 50px;
+  
+      h2{
+        float: left;
+        text-align: center;
+      }
+      
     }
-    
-  }
+  
 }
 
 .icon{
