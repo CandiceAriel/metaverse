@@ -101,7 +101,7 @@ function init() {
         scene.add(bathroomModel);
         bathroomModel.position.x = mesh.position.x + 5;
         bathroomModel.position.y = mesh.position.y - 0.5;
-        bathroomModel.position.z = camera.position.z - 10;
+        bathroomModel.position.z = camera.position.z - 7;
         bathroomModel.scale.set(0.04, 0.04, 0.04);
         bathroomModel.rotateY(Math.PI / 2);
         //bathroomModel.rotateX( Math.PI / 1);
