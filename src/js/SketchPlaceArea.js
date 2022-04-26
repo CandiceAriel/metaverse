@@ -193,6 +193,7 @@ function animate() {
 
   velocity += ( speed - velocity ) * .3;
   mesh.translateZ( velocity );
+  ctrl.moveForward(velocity);
 
   if ( keys.a ){
     mesh.rotateY(0.03);

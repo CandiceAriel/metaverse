@@ -6,6 +6,7 @@
         <button class="btn_lock">Pointer Lock</button>
         <div class="desktop-help" id="desktopInstruction">
           <div class="desktop-help__header">
+            <h2>Instruction</h2>
             <img id="iconClose" class="icon__close" src = "../assets/Icons/close.png" alt="keys"/>
           </div>
           <img class="icon__keys" src = "../assets/Icons/buttons.png" alt="keys"/>
@@ -31,5 +32,5 @@ export default {
 };
 
 import "../js/Home.js";
-import "../css/style.scss";
+import "../scss/style.scss";
 </script>

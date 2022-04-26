@@ -30,5 +30,5 @@ export default {
 };
 
 import "../js/SketchPlaceArea.js";
-import "../css/style.scss";
+import "../scss/style.scss";
 </script>

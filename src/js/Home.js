@@ -38,18 +38,18 @@ let moveBackward = false;
 let rotateRight = false;
 let rotateLeft = false;
 
-// var time = 0;
-// var newPosition = new THREE.Vector3();
-// var matrix = new THREE.Matrix4();
+var time = 0;
+var newPosition = new THREE.Vector3();
+var matrix = new THREE.Matrix4();
 
-// var stop = 1;
-// var DEGTORAD = 0.01745327;
-// var temp = new THREE.Vector3;
-// var dir = new THREE.Vector3;
-// var a = new THREE.Vector3;
-// var b = new THREE.Vector3;
-// var coronaSafetyDistance = 0.3;
-// var velocity = 0.0;
+var stop = 1;
+var DEGTORAD = 0.01745327;
+var temp = new THREE.Vector3;
+var dir = new THREE.Vector3;
+var a = new THREE.Vector3;
+var b = new THREE.Vector3;
+var coronaSafetyDistance = 0.3;
+var velocity = 0.0;
 // var speed = 0.0;
 
 //initialize
@@ -63,7 +63,7 @@ function init() {
     1000
   );
   camera.position.x += (mouseX - camera.position.x) * 0.05;
-  camera.position.x += (mouseX - camera.position.x) * 0.05;
+  camera.position.y += (mouseX - camera.position.x) * 0.05;
   //camera.position.z = -10;
 
   clock = new Clock();
@@ -105,13 +105,20 @@ function init() {
   function checkButton() {
     if (btnLock.length > 0) {
       btnLock[0].addEventListener('click', () => {
-        console.log("clicked");
         control.lock();
-    })
+      })
     } else {
       setTimeout(checkButton, 1000);
     }
   }
+
+  control.addEventListener( 'unlock', function () {
+
+   console.log ("unlock")
+   camera.position.x = 0;
+   camera.position.y = 0;
+  
+  } );
 
   const onProgress = function (xhr) {
     if (xhr.lengthComputable) {
@@ -202,9 +209,9 @@ function init() {
 
     cube.position.x = 0;
     cube.position.y = blockPlane.position.y + 3;
-    cube.position.z = camera.position.z;
+    cube.position.z = camera.position.z - 2;
 
-    // goal = new THREE.Object3D;
+    goal = new THREE.Object3D;
     // follow = new THREE.Object3D;
     // follow.position.z = -coronaSafetyDistance;
     // cube.add(camera);
@@ -240,7 +247,7 @@ function init() {
   checkButton();
   addObj();
 
-  document.addEventListener("keydown", onDocumentKeyDown);
+  document.addEventListener("keydown", onKeyDown);
   document.addEventListener("keyup", onKeyUp);
 }
 //
@@ -252,6 +259,35 @@ var render = function () {
 var animate = function () {
   requestAnimationFrame(animate);
   
+  let speed = 0.0;
+
+ 
+  if ( keys.w )
+    speed = -0.5
+  else if ( keys.s )
+    speed = 0.5;
+
+  velocity += (speed - velocity) * .3;
+  //cube.translateZ(velocity)
+  control.moveForward( - velocity)
+
+  if ( keys.a ){
+    camera.rotateY (0.2)
+
+  }else if ( keys.d ){
+    camera.rotateY(-0.2);
+  }
+
+  //camera.lookAt(cube.position)
+
+  a.lerp(cube.position, 0.4);
+  b.copy(goal.position);
+
+  dir.copy( a ).sub( b ).normalize();
+  // const dis = a.distanceTo( b ) - coronaSafetyDistance;
+  // goal.position.addScaledVector( dir, dis );
+  // goal.position.lerp(temp, 0.06);
+  // temp.setFromMatrixPosition(follow.matrixWorld);
   
   render();
 }
@@ -268,17 +304,23 @@ function onWindowResize() {
   camera.updateProjectionMatrix();
 }
 
+keys = {
+  a: false,
+  s: false,
+  d: false,
+  w: false,
+  q: false,
+  e: false
+};
+
+
 //Character/user move
 function onDocumentKeyDown(event) {
-  let speed = 0.5;
+  let speed = 0.2;
   var keyCode = event.which;
 
   // 87 = 'W'; 83 = 'S'; 65 = 'A'; 68 = 'D'
-  if (keyCode == 87) {
-    //cube.position.z -= zSpeed;
-    control.moveForward(speed);
-    moveForward = true;
-  } else if (keyCode == 83) {
+   if (keyCode == 83) {
     //cube.position.z += zSpeed;
     control.moveForward(-speed);
   } else if (keyCode == 65) {
@@ -296,25 +338,29 @@ function onDocumentKeyDown(event) {
   }else if (keyCode == 32) {
     cube.position.set(0, -1, camera.position.z - 1);
     camera.position.set(0, 0, 0);
+  } else if ( keycode == 27) {
+    unlocked == true;
   }
 
   mouseX = (event.clientX - windowHalfX) / 2;
   mouseY = (event.clientY - windowHalfY) / 2;
 }
 
-function onKeyUp(event) {
-  var keyCode = event.which;
+function onKeyDown(e) {
+  let speed = 0.2;
+  
+  const key = e.code.replace('Key', '').toLowerCase();
+    if ( keys[ key ] !== undefined )
+      keys[ key ] = true;
 
-  // 87 = 'W'; 83 = 'S'; 65 = 'A'; 68 = 'D'
-  if (keyCode == 87) {
-    moveForward = false;
-  } else if (keyCode == 83) {
-    moveBackward = false;
-  } else if (keyCode == 65) {
-    rotateLeft = false;
-  } else if (keyCode == 68) {
-    rotateRight = false;
-  }
+  mouseX = (event.clientX - windowHalfX) / 2;
+  mouseY = (event.clientY - windowHalfY) / 2;
+}
+
+function onKeyUp(e) {
+  const key = e.code.replace('Key', '').toLowerCase();
+    if ( keys[ key ] !== undefined )
+      keys[ key ] = false;
 }
 
 // run functions
