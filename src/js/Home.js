@@ -22,6 +22,7 @@ let ambientLight, pointLight;
 let clock, control, orbitctrl;
 
 let bathroomModel, bathroomMtl, bathroomMtl2;
+let livingRoomModel, livingRoomMtl;
 let cube, blockPlane;
 let mouseIsDown = false;
 
@@ -57,14 +58,15 @@ function init() {
   //ADD CAMERA
   //camera = new THREE.PerspectiveCamera( 90, window.innerWidth / window.innerHeight, 1, 500 );
   camera = new THREE.PerspectiveCamera(
-    100,
+    80,
     window.innerWidth / window.innerHeight,
     1,
-    1000
+    500
   );
   camera.position.x += (mouseX - camera.position.x) * 0.05;
-  camera.position.y += (mouseX - camera.position.x) * 0.05;
-  //camera.position.z = -10;
+  camera.position.y += -1;
+  camera.position.z = -10;
+  //camera.lookAt (new THREE.Vector3(-4,0,0));
 
   clock = new Clock();
   control = new PointerLockControls(camera, render.domElement);
@@ -96,6 +98,7 @@ function init() {
   function checkCanvas() {
     if (homecontainer.length > 0) {
       homecontainer[0].appendChild(renderer.domElement);
+      //orbitctrl = new OrbitControls( camera, renderer.domElement);
       //domEl = renderer.domElement;
     } else {
       setTimeout(checkCanvas, 1000);
@@ -152,7 +155,7 @@ function init() {
         // })
         bathroomModel = object;
         scene.add(bathroomModel);
-        bathroomModel.position.x = cube.position.x + 10;
+        bathroomModel.position.x = camera.position.x + 15;
         bathroomModel.position.y = blockPlane.position.y + 1;
         bathroomModel.position.z = camera.position.z - 10;
         bathroomModel.scale.set(0.04, 0.04, 0.04);
@@ -188,11 +191,40 @@ function init() {
         //     }
         // })
         scene.add(object);
-        object.position.x = cube.position.x - 10;
+        object.position.x = camera.position.x - 13;
         object.position.y = blockPlane.position.y + 1;
         object.position.z = bathroomModel.position.z;
         object.scale.set(0.04, 0.04, 0.04);
         object.rotateY(Math.PI / -2);
+      },
+      onProgress,
+      (error) => {
+        console.log(error);
+      }
+    );
+  }
+
+  // const mtlLoaderLiving = new MTLLoader();
+  // function loadMaterial2() {
+  //   mtlLoader2.load("model/mtl/3d-model.mtl", function (material) {
+  //     material.preload();
+  //     bathroomMtl2 = material;
+  //     loadModelLiving(livingRoomMtl);
+  //   });
+  // }
+
+  const objLoaderLiving = new OBJLoader();
+  function loadModelLiving() {
+    //objLoaderLiving.setMaterials(livingRoomMtl);
+    objLoaderLiving.load(
+      "model/obj/Preview Living Room_OBJ.obj",
+      (object) => {
+        scene.add(object);
+        object.position.x = camera.position.x;
+        object.position.y = blockPlane.position.y + 1;
+        object.position.z = camera.position.z - 30;
+        object.scale.set(0.02, 0.02, 0.02);
+        //object.rotateY(Math.PI / 8);
       },
       onProgress,
       (error) => {
@@ -218,7 +250,7 @@ function init() {
     // cube.add( follow );
 
     // goal.add( camera );
-    scene.add( cube );
+    //scene.add( cube );
   }
 
   function createFloor() {
@@ -240,6 +272,7 @@ function init() {
     createFloor();
     loadMaterial();
     loadMaterial2();
+    loadModelLiving();
     addCube();
   }
 
@@ -288,6 +321,8 @@ var animate = function () {
   // goal.position.addScaledVector( dir, dis );
   // goal.position.lerp(temp, 0.06);
   // temp.setFromMatrixPosition(follow.matrixWorld);
+
+  //orbitctrl.update();
   
   render();
 }
