@@ -2,6 +2,7 @@ import * as THREE from "three";
 
 import { OBJLoader } from "../../public/js/obj.js";
 import { MTLLoader } from "../../public/js/mtl.js";
+import { FBXLoader } from "../../public/js/FBXLoader.js";
 import { PointerLockControls } from "../../public/js/PointerLockControls.js";
 import { OrbitControls } from "../../public/js/OrbitControls.js";
 import { Clock } from "../../public/js/Clock.js";
@@ -23,6 +24,7 @@ let clock, control, orbitctrl;
 
 let bathroomModel, bathroomMtl, bathroomMtl2;
 let livingRoomModel, livingRoomMtl;
+let materialLiving;
 let cube, blockPlane;
 let mouseIsDown = false;
 
@@ -40,6 +42,7 @@ let rotateRight = false;
 let rotateLeft = false;
 
 var time = 0;
+let prevTime = performance.now();
 var newPosition = new THREE.Vector3();
 var matrix = new THREE.Matrix4();
 
@@ -58,7 +61,7 @@ function init() {
   //ADD CAMERA
   //camera = new THREE.PerspectiveCamera( 90, window.innerWidth / window.innerHeight, 1, 500 );
   camera = new THREE.PerspectiveCamera(
-    80,
+    100,
     window.innerWidth / window.innerHeight,
     1,
     500
@@ -91,15 +94,24 @@ function init() {
     antialias: true,
   });
   renderer.setSize(window.innerWidth, window.innerHeight);
-  // renderer.setAnimationLoop(animation);
+  
+
+  function addOrbitControl(){
+    orbitctrl = new OrbitControls( camera, renderer.domElement);
+    orbitctrl.target = new THREE.Vector3(0, 0, 0);
+    orbitctrl.rotateY(Math.PI / -2);
+    orbitctrl.update();
+
+    orbitctrl.minPolarAngle = Math.PI/2;
+    orbitctrl.maxPolarAngle = Math.PI/2;
+  }
 
   //CHECK IF ELEMENTS CONTAINER RENDERED
   //ADD RENDERE TO CANVAS
   function checkCanvas() {
     if (homecontainer.length > 0) {
       homecontainer[0].appendChild(renderer.domElement);
-      //orbitctrl = new OrbitControls( camera, renderer.domElement);
-      //domEl = renderer.domElement;
+      //addOrbitControl();
     } else {
       setTimeout(checkCanvas, 1000);
     }
@@ -114,14 +126,6 @@ function init() {
       setTimeout(checkButton, 1000);
     }
   }
-
-  control.addEventListener( 'unlock', function () {
-
-   console.log ("unlock")
-   camera.position.x = 0;
-   camera.position.y = 0;
-  
-  } );
 
   const onProgress = function (xhr) {
     if (xhr.lengthComputable) {
@@ -155,7 +159,7 @@ function init() {
         // })
         bathroomModel = object;
         scene.add(bathroomModel);
-        bathroomModel.position.x = camera.position.x + 15;
+        bathroomModel.position.x = camera.position.x + 10;
         bathroomModel.position.y = blockPlane.position.y + 1;
         bathroomModel.position.z = camera.position.z - 10;
         bathroomModel.scale.set(0.04, 0.04, 0.04);
@@ -169,31 +173,25 @@ function init() {
     );
   }
 
-  const mtlLoader2 = new MTLLoader();
-  function loadMaterial2() {
-    mtlLoader2.load("model/mtl/3d-model.mtl", function (material) {
-      material.preload();
-      bathroomMtl2 = material;
-      loadModel2(bathroomMtl2);
-    });
-  }
+  // const mtlLoader2 = new MTLLoader();
+  // function loadMaterial2() {
+  //   mtlLoader2.load("model/mtl/3d-model.mtl", function (material) {
+  //     material.preload();
+  //     bathroomMtl2 = material;
+  //     loadModel2(bathroomMtl2);
+  //   });
+  // }
 
-  const objLoader2 = new OBJLoader();
-  function loadModel2(bathroomMtl2) {
-    objLoader2.setMaterials(bathroomMtl2);
+  const objLoader2 = new FBXLoader();
+  function loadModel2() {
+    //objLoader2.setMaterials(bathroomMtl2);
     objLoader2.load(
-      "model/obj/3d-model.obj",
+      "model/obj/3d-model.fbx",
       (object) => {
-        // (object.children[0] as THREE.Mesh).material = material
-        // object.traverse(function (child) {
-        //     if ((child as THREE.Mesh).isMesh) {
-        //         (child as THREE.Mesh).material = material
-        //     }
-        // })
         scene.add(object);
-        object.position.x = camera.position.x - 13;
+        object.position.x = camera.position.x - 10;
         object.position.y = blockPlane.position.y + 1;
-        object.position.z = bathroomModel.position.z;
+        object.position.z = camera.position.z - 10;
         object.scale.set(0.04, 0.04, 0.04);
         object.rotateY(Math.PI / -2);
       },
@@ -204,14 +202,11 @@ function init() {
     );
   }
 
-  // const mtlLoaderLiving = new MTLLoader();
-  // function loadMaterial2() {
-  //   mtlLoader2.load("model/mtl/3d-model.mtl", function (material) {
-  //     material.preload();
-  //     bathroomMtl2 = material;
-  //     loadModelLiving(livingRoomMtl);
-  //   });
-  // }
+  //load texture
+  const textureLoader = new THREE.TextureLoader();
+    livingRoomMtl = new THREE.MeshBasicMaterial({
+      map: textureLoader.load("model/mtl/Textures/Walls_Materials.png")
+    });
 
   const objLoaderLiving = new OBJLoader();
   function loadModelLiving() {
@@ -222,9 +217,13 @@ function init() {
         scene.add(object);
         object.position.x = camera.position.x;
         object.position.y = blockPlane.position.y + 1;
-        object.position.z = camera.position.z - 30;
+        object.position.z = camera.position.z - 20;
         object.scale.set(0.02, 0.02, 0.02);
+        livingRoomModel = object;
         //object.rotateY(Math.PI / 8);
+
+        console.log(object.getObjectByName("Walls"));
+        object.getObjectByName("Walls").material=livingRoomMtl;
       },
       onProgress,
       (error) => {
@@ -233,23 +232,14 @@ function init() {
     );
   }
 
-  function addCube() {
-    const geometry = new THREE.ConeGeometry( 0.05, 0.5 );
-    const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
-    cube = new THREE.Mesh(geometry, material);
-    //scene.add(cube);
-
-    cube.position.x = 0;
-    cube.position.y = blockPlane.position.y + 3;
-    cube.position.z = camera.position.z - 2;
-
+  function addControl() {
     goal = new THREE.Object3D;
-    // follow = new THREE.Object3D;
-    // follow.position.z = -coronaSafetyDistance;
-    // cube.add(camera);
-    // cube.add( follow );
+    follow = new THREE.Object3D;
+    follow.position.z = -coronaSafetyDistance;
+    //control.add(camera);
+    //control.add( follow );
 
-    // goal.add( camera );
+    goal.add( camera );
     //scene.add( cube );
   }
 
@@ -271,9 +261,9 @@ function init() {
   function addObj() {
     createFloor();
     loadMaterial();
-    loadMaterial2();
+    loadModel2();
     loadModelLiving();
-    addCube();
+    //addControl();
   }
 
   checkCanvas();
@@ -291,18 +281,22 @@ var render = function () {
 
 var animate = function () {
   requestAnimationFrame(animate);
+  const time = performance.now();
+  const delta = ( time - prevTime ) / 1000;
   
   let speed = 0.0;
 
  
   if ( keys.w )
-    speed = -0.5
+    speed = -5;
   else if ( keys.s )
-    speed = 0.5;
+    speed = 5;
 
   velocity += (speed - velocity) * .3;
   //cube.translateZ(velocity)
   control.moveForward( - velocity)
+  control.minPolarAngle = Math.PI/2;
+  control.maxPolarAngle = Math.PI/2;
 
   if ( keys.a ){
     camera.rotateY (0.2)
@@ -313,16 +307,14 @@ var animate = function () {
 
   //camera.lookAt(cube.position)
 
-  a.lerp(cube.position, 0.4);
-  b.copy(goal.position);
+  // a.lerp(camera.position, 0.4);
+  // b.copy(goal.position);
 
-  dir.copy( a ).sub( b ).normalize();
+  // dir.copy( a ).sub( b ).normalize();
   // const dis = a.distanceTo( b ) - coronaSafetyDistance;
   // goal.position.addScaledVector( dir, dis );
   // goal.position.lerp(temp, 0.06);
   // temp.setFromMatrixPosition(follow.matrixWorld);
-
-  //orbitctrl.update();
   
   render();
 }
@@ -347,39 +339,6 @@ keys = {
   q: false,
   e: false
 };
-
-
-//Character/user move
-function onDocumentKeyDown(event) {
-  let speed = 0.2;
-  var keyCode = event.which;
-
-  // 87 = 'W'; 83 = 'S'; 65 = 'A'; 68 = 'D'
-   if (keyCode == 83) {
-    //cube.position.z += zSpeed;
-    control.moveForward(-speed);
-  } else if (keyCode == 65) {
-    //cube.position.x -= xSpeed ;
-    control.moveRight(-speed);
-  } else if (keyCode == 68) {
-    //cube.position.x += xSpeed;
-    control.moveRight(speed);
-  } else if (keyCode == 81){
-    //cube.position.x -= xSpeed - camera.position.z;
-    camera.rotateY (Math.PI / 2) //a
-  }else if (keyCode == 69){
-    //cube.position.x -= xSpeed - camera.position.z;
-    camera.rotateY (Math.PI / -2) //a
-  }else if (keyCode == 32) {
-    cube.position.set(0, -1, camera.position.z - 1);
-    camera.position.set(0, 0, 0);
-  } else if ( keycode == 27) {
-    unlocked == true;
-  }
-
-  mouseX = (event.clientX - windowHalfX) / 2;
-  mouseY = (event.clientY - windowHalfY) / 2;
-}
 
 function onKeyDown(e) {
   let speed = 0.2;
