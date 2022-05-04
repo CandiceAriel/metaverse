@@ -13,10 +13,8 @@
           <div>
             <p> W : move forward </p>
             <p> S : move backward </p>
-            <p> A : move left </p>
-            <p> D : move right </p>
-            <p> Q : rotate left </p>
-            <p> E : rotate right </p>
+            <p> A : rotate left </p>
+            <p> D : rotate right </p>
           </div>
         </div>
       </div>

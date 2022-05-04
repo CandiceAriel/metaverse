@@ -36,11 +36,6 @@ let xSpeed = 0.5;
 let zSpeed = 0.5;
 let rSpeed = 1.5;
 
-let moveForward = false;
-let moveBackward = false;
-let rotateRight = false;
-let rotateLeft = false;
-
 var time = 0;
 let prevTime = performance.now();
 var newPosition = new THREE.Vector3();
@@ -134,6 +129,12 @@ function init() {
     }
   };
 
+  //load textures and materials
+  const textureLoader = new THREE.TextureLoader();
+    livingRoomMtl = new THREE.MeshBasicMaterial({
+      map: textureLoader.load("model/mtl/Textures/Walls_Materials.png")
+    });
+
   const mtlLoader = new MTLLoader();
   function loadMaterial() {
     mtlLoader.load("model/mtl/3d-model.mtl", function (materials) {
@@ -201,13 +202,8 @@ function init() {
       }
     );
   }
-
-  //load texture
-  const textureLoader = new THREE.TextureLoader();
-    livingRoomMtl = new THREE.MeshBasicMaterial({
-      map: textureLoader.load("model/mtl/Textures/Walls_Materials.png")
-    });
-
+  
+  //Load living room model
   const objLoaderLiving = new OBJLoader();
   function loadModelLiving() {
     //objLoaderLiving.setMaterials(livingRoomMtl);
@@ -222,8 +218,8 @@ function init() {
         livingRoomModel = object;
         //object.rotateY(Math.PI / 8);
 
-        console.log(object.getObjectByName("Walls"));
-        object.getObjectByName("Walls").material=livingRoomMtl;
+        //set textures per mesh/object
+        object.getObjectByName("Walls").material = livingRoomMtl;
       },
       onProgress,
       (error) => {
@@ -282,19 +278,19 @@ var render = function () {
 var animate = function () {
   requestAnimationFrame(animate);
   const time = performance.now();
-  const delta = ( time - prevTime ) / 1000;
+  const delta = ( time - prevTime ) / 5000;
   
   let speed = 0.0;
 
  
   if ( keys.w )
-    speed = -5;
+    speed = -0.5;
   else if ( keys.s )
-    speed = 5;
+    speed = 0.5;
 
   velocity += (speed - velocity) * .3;
   //cube.translateZ(velocity)
-  control.moveForward( - velocity)
+  control.moveForward( - velocity )
   control.minPolarAngle = Math.PI/2;
   control.maxPolarAngle = Math.PI/2;
 
