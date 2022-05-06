@@ -62,14 +62,12 @@ function init() {
     500
   );
   camera.position.x += (mouseX - camera.position.x) * 0.05;
-  camera.position.y += -1;
+  camera.position.y += -0.5;
   camera.position.z = -10;
   //camera.lookAt (new THREE.Vector3(-4,0,0));
 
   clock = new Clock();
   control = new PointerLockControls(camera, render.domElement);
-  control.minPolarAngle = Math.PI/2;
-  control.maxPolarAngle = Math.PI/2;
 
   //SCENE
   //create new scene
@@ -139,6 +137,12 @@ function init() {
       hexagonaltiles : new THREE.MeshBasicMaterial({
         map: textureLoader.load("model/mtl/Textures/tiles_unwrap.png")
       }),
+      mapletiles : new THREE.MeshBasicMaterial({
+        map: textureLoader.load("model/mtl/Textures/Maple.png")
+      }), 
+      maplehoney : new THREE.MeshBasicMaterial({
+        map: textureLoader.load("model/mtl/Textures/Maple_honey.png")
+      }), 
     }
 
   // load model
@@ -219,6 +223,14 @@ function init() {
         //set textures per mesh/object
         object.getObjectByName("Walls").material = livingRoomMtl.walltexture;
         object.getObjectByName("Tiles").material = livingRoomMtl.hexagonaltiles;
+        object.getObjectByName("Cylinder001").material = livingRoomMtl.maplehoney;
+        object.getObjectByName("Cylinder043").material = livingRoomMtl.maplehoney;
+        
+        //bookshelf
+        object.getObjectByName("Box045").material = livingRoomMtl.maplehoney;
+        object.getObjectByName("Box039").material = livingRoomMtl.maplehoney;
+        object.getObjectByName("Box040").material = livingRoomMtl.maplehoney;
+        object.getObjectByName("Box044").material = livingRoomMtl.maplehoney;
       },
       onProgress,
       (error) => {
@@ -271,9 +283,9 @@ var animate = function () {
 
  
   if ( keys.w )
-    speed = -0.5;
+    speed = -0.3;
   else if ( keys.s )
-    speed = 0.5;
+    speed = 0.3;
 
   velocity += (speed - velocity) * .3;
   //cube.translateZ(velocity)
