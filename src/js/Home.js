@@ -7,7 +7,7 @@ import { PointerLockControls } from "../../public/js/PointerLockControls.js";
 import { OrbitControls } from "../../public/js/OrbitControls.js";
 import { Clock } from "../../public/js/Clock.js";
 
-const homecontainer = document.getElementsByClassName("home_canvas_container");
+const canvas = document.getElementsByClassName("canvas");
 const btnLock = document.getElementsByClassName("btn_lock");
 
 $( document ).ready(function() {
@@ -68,6 +68,8 @@ function init() {
 
   clock = new Clock();
   control = new PointerLockControls(camera, render.domElement);
+  control.minPolarAngle = Math.PI/2;
+  control.maxPolarAngle = Math.PI/2;
 
   //SCENE
   //create new scene
@@ -90,22 +92,11 @@ function init() {
   });
   renderer.setSize(window.innerWidth, window.innerHeight);
   
-
-  function addOrbitControl(){
-    orbitctrl = new OrbitControls( camera, renderer.domElement);
-    orbitctrl.target = new THREE.Vector3(0, 0, 0);
-    orbitctrl.rotateY(Math.PI / -2);
-    orbitctrl.update();
-
-    orbitctrl.minPolarAngle = Math.PI/2;
-    orbitctrl.maxPolarAngle = Math.PI/2;
-  }
-
   //CHECK IF ELEMENTS CONTAINER RENDERED
   //ADD RENDERE TO CANVAS
   function checkCanvas() {
-    if (homecontainer.length > 0) {
-      homecontainer[0].appendChild(renderer.domElement);
+    if (canvas.length > 0) {
+      canvas[0].appendChild(renderer.domElement);
       //addOrbitControl();
     } else {
       setTimeout(checkCanvas, 1000);
@@ -130,10 +121,6 @@ function init() {
   };
 
   //load textures and materials
-  const textureLoader = new THREE.TextureLoader();
-    livingRoomMtl = new THREE.MeshBasicMaterial({
-      map: textureLoader.load("model/mtl/Textures/Walls_Materials.png")
-    });
 
   const mtlLoader = new MTLLoader();
   function loadMaterial() {
@@ -143,6 +130,16 @@ function init() {
       loadModel(bathroomMtl);
     });
   }
+
+  const textureLoader = new THREE.TextureLoader();
+    livingRoomMtl = {
+      walltexture : new THREE.MeshBasicMaterial({
+        map: textureLoader.load("model/mtl/Textures/Walls_Materials.png")
+      }),
+      hexagonaltiles : new THREE.MeshBasicMaterial({
+        map: textureLoader.load("model/mtl/Textures/tiles_unwrap.png")
+      }),
+    }
 
   // load model
   // X cord : left and right
@@ -212,14 +209,16 @@ function init() {
       (object) => {
         scene.add(object);
         object.position.x = camera.position.x;
-        object.position.y = blockPlane.position.y + 1;
+        object.position.y = blockPlane.position.y + 1.5;
         object.position.z = camera.position.z - 20;
         object.scale.set(0.02, 0.02, 0.02);
         livingRoomModel = object;
         //object.rotateY(Math.PI / 8);
+        console.log(livingRoomModel);
 
         //set textures per mesh/object
-        object.getObjectByName("Walls").material = livingRoomMtl;
+        object.getObjectByName("Walls").material = livingRoomMtl.walltexture;
+        object.getObjectByName("Tiles").material = livingRoomMtl.hexagonaltiles;
       },
       onProgress,
       (error) => {
@@ -228,20 +227,9 @@ function init() {
     );
   }
 
-  function addControl() {
-    goal = new THREE.Object3D;
-    follow = new THREE.Object3D;
-    follow.position.z = -coronaSafetyDistance;
-    //control.add(camera);
-    //control.add( follow );
-
-    goal.add( camera );
-    //scene.add( cube );
-  }
-
   function createFloor() {
     let pos = { x: 0, y: -4, z: 3 };
-    let scale = { x: 100, y: 2, z: 100 };
+    let scale = { x: 2000, y: 2, z: 2000 };
 
     blockPlane = new THREE.Mesh(
       new THREE.BoxBufferGeometry(),
@@ -257,9 +245,8 @@ function init() {
   function addObj() {
     createFloor();
     loadMaterial();
-    loadModel2();
+    //loadModel2();
     loadModelLiving();
-    //addControl();
   }
 
   checkCanvas();

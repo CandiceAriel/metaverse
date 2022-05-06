@@ -1,7 +1,7 @@
 <template>
   <div class="home">
     <div class="container" id="homeContainer">
-      <div class="home_canvas_container"></div>
+      <div class="canvas"></div>
       <div class="home_content">
         <button class="btn_lock">Pointer Lock</button>
         <div class="desktop-help" id="desktopInstruction">
