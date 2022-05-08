@@ -1,8 +1,8 @@
 <template>
-  <nav>
+  <!-- <nav>
     <a :href="$router.resolve({ name: 'home' }).href" class="nav-menu">Home</a>
-     <!-- <a :href="$router.resolve({ name: 'sketchArea' }).href" class="nav-menu">Sketch</a> -->
-  </nav>
+     <a :href="$router.resolve({ name: 'sketchArea' }).href" class="nav-menu">Sketch</a>
+  </nav> -->
   <router-view />
 </template>
 
