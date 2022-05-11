@@ -5,16 +5,18 @@
       <div class="home_content">
         <button class="btn_lock">Pointer Lock</button>
         <div class="desktop-help" id="desktopInstruction">
-          <div class="desktop-help__header">
-            <h2>Instruction</h2>
-            <img id="iconClose" class="icon__close" src = "../assets/Icons/close.png" alt="keys"/>
+          <div class="desktop-help-header">
+            <img id="iconClose" class="icon-close" src = "../assets/Icons/close.png" alt="keys"/>
+            <div>
+              <h2><strong>INSTRUCTION</strong></h2>
+            </div>
           </div>
-          <img class="icon__keys" src = "../assets/Icons/buttons.png" alt="keys"/>
-          <div>
-            <p> W : move forward </p>
-            <p> S : move backward </p>
-            <p> A : rotate left </p>
-            <p> D : rotate right </p>
+          <div class="desktop-help-content">
+            <img class="icon-keys" src = "../assets/Icons/buttons.png" alt="keys"/>
+            <p> <strong>W</strong> : move forward </p>
+            <p> <strong>S</strong> : move backward </p>
+            <p> <strong>A</strong> : rotate left </p>
+            <p> <strong>D</strong> : rotate right </p>
           </div>
         </div>
       </div>

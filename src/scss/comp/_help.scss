@@ -1,24 +1,46 @@
 @use '../misc';
 
 .desktop-help{
-    width: 600px;
-    background-color: white;
-    border-radius: 15px;
-    position: absolute;
-    top: 20%;
-    left: 34%;
-    padding: 10px;
-  
-      &__header {
-  
-        height: 50px;
-    
-        h2{
-          float: left;
-          text-align: center;
-          color: misc.$black;
-        }
-        
-      }
-    
+  width: 600px;
+  background-color: white;
+  border-radius: 15px;
+  position: absolute;
+  top: 20%;
+  left: 34%;
+  padding: 10px;
+}
+
+.desktop-help-header{
+  height: 50px;
+  width: 100%;
+  margin-bottom: 10px;
+
+  .icon-close{
+    height: 30px;
+    width: 30px;
+    padding: 10px 10px;
+    float: right;
   }
+
+  div{
+    position: relative;
+    text-align: center;
+    width: calc(100% - 30px);
+  }
+        
+}
+
+.desktop-help-content{
+  width: 33.3%;
+  margin: 0px auto;
+  text-align: center;
+
+  p{
+    text-align: left;
+  }
+
+  .icon-keys{
+    width: 95px;
+    margin-bottom: 10px;
+  }
+}

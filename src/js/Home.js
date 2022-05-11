@@ -11,7 +11,7 @@ const canvas = document.getElementsByClassName("canvas");
 const btnLock = document.getElementsByClassName("btn_lock");
 
 $( document ).ready(function() {
-  $(".icon__close").click(function(ev){
+  $(".icon-close").click(function(ev){
     $(".desktop-help").hide();
     console.log('icon clicked');
   })
@@ -245,7 +245,7 @@ function init() {
 
     blockPlane = new THREE.Mesh(
       new THREE.BoxBufferGeometry(),
-      new THREE.MeshPhongMaterial({ color: 0x139436 })
+      new THREE.MeshPhongMaterial({ material: livingRoomMtl.maplehoney })
     );
     blockPlane.position.set(pos.x, pos.y, pos.z);
     blockPlane.scale.set(scale.x, scale.y, scale.z);
