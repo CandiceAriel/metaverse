@@ -27,14 +27,12 @@ let livingRoomModel, livingRoomMtl;
 let materialLiving;
 let cube, blockPlane;
 let mouseIsDown = false;
+let pointer, raycaster, selectedObj;
 
 let mouseX = 0,
   mouseY = 0;
 let windowHalfX = window.innerWidth / 2;
 let windowHalfY = window.innerHeight / 2;
-let xSpeed = 0.5;
-let zSpeed = 0.5;
-let rSpeed = 1.5;
 
 var time = 0;
 let prevTime = performance.now();
@@ -83,6 +81,10 @@ function init() {
   camera.add(pointLight);
   scene.add(camera);
   console.log(camera.position)
+
+  //RAYCASTER
+  raycaster = new THREE.Raycaster();
+  pointer= new THREE.Vector2();
 
   //RENDERER
   renderer = new THREE.WebGLRenderer({
@@ -274,6 +276,23 @@ var render = function () {
   renderer.render(scene, camera);
 };
 
+function hoverMesh(){
+   // update the picking ray with the camera and pointer position
+	raycaster.setFromCamera( pointer, camera );
+
+	// calculate objects intersecting the picking ray
+	const intersects = raycaster.intersectObjects( scene.children );
+
+  if ( intersects.length > 0 ) {
+    
+    // const newMaterial = intersects[0].object.material.clone();
+    // newMaterial.transparent = true;
+    // newMaterial.opacity = 0.5;
+		// intersects[ 0 ].object.material = newMaterial;
+    
+  }
+}
+
 var animate = function () {
   requestAnimationFrame(animate);
   const time = performance.now();
@@ -311,6 +330,8 @@ var animate = function () {
   // goal.position.lerp(temp, 0.06);
   // temp.setFromMatrixPosition(follow.matrixWorld);
   
+  //resetMaterials();
+  hoverMesh();
   render();
 }
 
@@ -352,9 +373,34 @@ function onKeyUp(e) {
       keys[ key ] = false;
 }
 
+function onPointerMove( event ) {
+
+	// calculate pointer position in normalized device coordinates
+	// (-1 to +1) for both components
+
+	pointer.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+	pointer.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+
+}
+
+function onClickEvent( event ){
+  raycaster.setFromCamera( pointer, camera );
+
+	// calculate objects intersecting the picking ray
+	const intersects = raycaster.intersectObjects( scene.children );
+
+  if ( intersects.length > 0 ) {
+    selectedObj = intersects[ 0 ].object
+   
+  }
+  console.log(selectedObj);
+}
+
+
 // run functions
 init();
 animate();
 
 window.addEventListener("resize", onWindowResize);
-
+window.addEventListener( "pointermove", onPointerMove );
+window.addEventListener("click", onClickEvent);
