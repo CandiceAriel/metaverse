@@ -1,19 +1,19 @@
 @use '../misc';
 
 .desktop-help{
-  width: 600px;
-  background-color: white;
-  border-radius: 15px;
-  position: absolute;
-  top: 20%;
-  left: 34%;
-  padding: 10px;
-}
+    width: 600px;
+    background-color: white;
+    border-radius: 15px;
+    position: absolute;
+    top: 20%;
+    left: 34%;
+    padding: 10px;
+  }
 
 .desktop-help-header{
   height: 50px;
   width: 100%;
-  margin-bottom: 10px;
+  margin-bottom: 20px;
 
   .icon-close{
     height: 30px;
@@ -42,5 +42,17 @@
   .icon-keys{
     width: 95px;
     margin-bottom: 10px;
+  }
+}
+
+@media (min-width: 1025px) {
+  .desktop-help{
+    width: 600px;
+    background-color: white;
+    border-radius: 15px;
+    position: absolute;
+    top: 20%;
+    left: 21%;
+    padding: 10px;
   }
 }
