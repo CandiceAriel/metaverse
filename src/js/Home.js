@@ -24,7 +24,7 @@ let clock, control, orbitctrl;
 
 let bathroomModel, bathroomMtl, bathroomMtl2;
 let livingRoomModel, livingRoomMtl;
-let materialLiving;
+let objectCollection;
 let cube, blockPlane;
 let mouseIsDown = false;
 let pointer, raycaster, selectedObj;
@@ -122,61 +122,6 @@ function init() {
 
   //load textures and materials
 
-  const mtlLoader = new MTLLoader();
-  function loadMaterial() {
-    mtlLoader.load("model/mtl/3d-model.mtl", function (materials) {
-      materials.preload();
-      bathroomMtl = materials;
-      loadModel(bathroomMtl);
-    });
-  }
-
-  const textureLoader = new THREE.TextureLoader();
-    livingRoomMtl = {
-      walltexture : new THREE.MeshBasicMaterial({
-        map: textureLoader.load("model/mtl/Textures/Walls_Materials.png")
-      }),
-      hexagonaltiles : new THREE.MeshBasicMaterial({
-        map: textureLoader.load("model/mtl/Textures/tiles_unwrap.png")
-      }),
-      mapletiles : new THREE.MeshBasicMaterial({
-        map: textureLoader.load("model/mtl/Textures/Maple.png")
-      }), 
-      maplehoney : new THREE.MeshBasicMaterial({
-        map: textureLoader.load("model/mtl/Textures/Maple_honey.png")
-      }), 
-    }
-
-  // load model
-  // X cord : left and right
-  const objLoader = new OBJLoader();
-  function loadModel(bathroomMtl) {
-    objLoader.setMaterials(bathroomMtl);
-    objLoader.load(
-      "model/obj/3d-model.obj",
-      (object) => {
-        // (object.children[0] as THREE.Mesh).material = material
-        // object.traverse(function (child) {
-        //     if ((child as THREE.Mesh).isMesh) {
-        //         (child as THREE.Mesh).material = material
-        //     }
-        // })
-        bathroomModel = object;
-        scene.add(bathroomModel);
-        bathroomModel.position.x = camera.position.x + 10;
-        bathroomModel.position.y = blockPlane.position.y + 1;
-        bathroomModel.position.z = camera.position.z - 10;
-        bathroomModel.scale.set(0.04, 0.04, 0.04);
-        bathroomModel.rotateY(Math.PI / 2);
-        //bathroomModel.rotateX( Math.PI / 1);
-      },
-      onProgress,
-      (error) => {
-        console.log(error);
-      }
-    );
-  }
-
   // const mtlLoader2 = new MTLLoader();
   // function loadMaterial2() {
   //   mtlLoader2.load("model/mtl/3d-model.mtl", function (material) {
@@ -205,40 +150,92 @@ function init() {
       }
     );
   }
-  
-  //Load living room model
-  const objLoaderLiving = new OBJLoader();
-  function loadModelLiving() {
-    //objLoaderLiving.setMaterials(livingRoomMtl);
-    objLoaderLiving.load(
-      "model/obj/Preview Living Room_OBJ.obj",
-      (object) => {
-        scene.add(object);
-        object.position.x = camera.position.x;
-        object.position.y = blockPlane.position.y + 1.5;
-        object.position.z = camera.position.z - 20;
-        object.scale.set(0.02, 0.02, 0.02);
-        livingRoomModel = object;
-        //object.rotateY(Math.PI / 8);
-        console.log(livingRoomModel);
 
-        //set textures per mesh/object
-        object.getObjectByName("Walls").material = livingRoomMtl.walltexture;
-        object.getObjectByName("Tiles").material = livingRoomMtl.hexagonaltiles;
-        object.getObjectByName("Cylinder001").material = livingRoomMtl.maplehoney;
-        object.getObjectByName("Cylinder043").material = livingRoomMtl.maplehoney;
-        
-        //bookshelf
-        object.getObjectByName("Box045").material = livingRoomMtl.maplehoney;
-        object.getObjectByName("Box039").material = livingRoomMtl.maplehoney;
-        object.getObjectByName("Box040").material = livingRoomMtl.maplehoney;
-        object.getObjectByName("Box044").material = livingRoomMtl.maplehoney;
-      },
-      onProgress,
-      (error) => {
-        console.log(error);
-      }
-    );
+  const mtlLoader = new MTLLoader();
+  
+  function loadMaterial() {
+    mtlLoader.load("model/mtl/3d-model.mtl", function (materials) {
+      materials.preload();
+      bathroomMtl = materials;
+      loadModel(bathroomMtl);
+    });
+  }
+
+  const textureLoader = new THREE.TextureLoader();
+    livingRoomMtl = {
+      walltexture : new THREE.MeshBasicMaterial({
+        map: textureLoader.load("model/mtl/Textures/Walls_Materials.png")
+      }),
+      hexagonaltiles : new THREE.MeshBasicMaterial({
+        map: textureLoader.load("model/mtl/Textures/tiles_unwrap.png")
+      }),
+      mapletiles : new THREE.MeshBasicMaterial({
+        map: textureLoader.load("model/mtl/Textures/Maple.png")
+      }), 
+      maplehoney : new THREE.MeshBasicMaterial({
+        map: textureLoader.load("model/mtl/Textures/Maple_honey.png")
+      }), 
+    }
+
+  // load model
+  // X cord : left and right
+  const objLoader = new OBJLoader();
+  function loadModel() {
+    //objLoader.setMaterials(bathroomMtl);
+    objectCollection = {
+      //bathroom model
+      bathroom : objLoader.load(
+        "model/obj/3d-model.obj",
+        (object) => {
+          bathroomModel = object;
+          scene.add(bathroomModel);
+          bathroomModel.position.x = camera.position.x + 10;
+          bathroomModel.position.y = blockPlane.position.y + 1;
+          bathroomModel.position.z = camera.position.z - 10;
+          bathroomModel.scale.set(0.04, 0.04, 0.04);
+          bathroomModel.rotateY(Math.PI / 2);
+
+          console.log(bathroomModel);
+          
+        },
+        onProgress,
+        (error) => {
+          console.log(error);
+        }
+      ),
+
+      //living room model 
+      livingRoom : objLoader.load(
+        "model/obj/Preview Living Room_OBJ.obj",
+        (object) => {
+          livingRoomModel = object;
+          scene.add(livingRoomModel);
+          livingRoomModel.position.x = camera.position.x;
+          livingRoomModel.position.y = blockPlane.position.y + 1.5;
+          livingRoomModel.position.z = camera.position.z - 20;
+          livingRoomModel.scale.set(0.02, 0.02, 0.02);
+          
+          //object.rotateY(Math.PI / 8);
+          console.log(livingRoomModel);
+  
+          //set textures per mesh/object
+          livingRoomModel.getObjectByName("Walls").material = livingRoomMtl.walltexture;
+          livingRoomModel.getObjectByName("Tiles").material = livingRoomMtl.hexagonaltiles;
+          livingRoomModel.getObjectByName("Cylinder001").material = livingRoomMtl.maplehoney;
+          livingRoomModel.getObjectByName("Cylinder043").material = livingRoomMtl.maplehoney;
+          
+          //bookshelf
+          livingRoomModel.getObjectByName("Box045").material = livingRoomMtl.maplehoney;
+          livingRoomModel.getObjectByName("Box039").material = livingRoomMtl.maplehoney;
+          livingRoomModel.getObjectByName("Box040").material = livingRoomMtl.maplehoney;
+          livingRoomModel.getObjectByName("Box044").material = livingRoomMtl.maplehoney;
+        },
+        onProgress,
+        (error) => {
+          console.log(error);
+        }
+      ),
+    }
   }
 
   function createFloor() {
@@ -258,9 +255,9 @@ function init() {
 
   function addObj() {
     createFloor();
-    loadMaterial();
+    loadModel();
     //loadModel2();
-    loadModelLiving();
+    //loadModelLiving();
   }
 
   checkCanvas();
