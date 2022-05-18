@@ -23,12 +23,16 @@ let camera, scene, renderer,mesh, goal, keys, follow;
 let ambientLight, pointLight;
 let clock, control, orbitctrl;
 
+let cube, blockPlane;
+let pointer, raycaster, selectedObj;
+
+//custom obj and materials
 let bathroomModel, bathroomMtl, bathroomMtl2;
 let livingRoomModel, livingRoomMtl;
 let objectCollection;
-let cube, blockPlane;
-let mouseIsDown = false;
-let pointer, raycaster, selectedObj;
+
+//material
+let wallmaterials;
 
 let mouseX = 0,
   mouseY = 0;
@@ -175,11 +179,12 @@ function init() {
     });
   }
 
+
+  //load materials.
+  //output : object collections of materials. Categorized by Mesh for example : Walls, tiles, furniture surface, decoration, etc.
   const textureLoader = new THREE.TextureLoader();
     livingRoomMtl = {
-      walltexture : new THREE.MeshBasicMaterial({
-        map: textureLoader.load("model/mtl/Textures/Walls_Materials.png")
-      }),
+      
       hexagonaltiles : new THREE.MeshBasicMaterial({
         map: textureLoader.load("model/mtl/Textures/tiles_unwrap.png")
       }),
@@ -189,6 +194,12 @@ function init() {
       maplehoney : new THREE.MeshBasicMaterial({
         map: textureLoader.load("model/mtl/Textures/Maple_honey.png")
       }), 
+    }
+
+    wallmaterials = {
+      walltexture : new THREE.MeshBasicMaterial({
+        map: textureLoader.load("model/mtl/Textures/Walls_Materials.png")
+      }),
     }
 
   // load model
@@ -233,8 +244,10 @@ function init() {
           console.log(livingRoomModel);
   
           //set textures per mesh/object
-          livingRoomModel.getObjectByName("Walls").material = livingRoomMtl.walltexture;
+          livingRoomModel.getObjectByName("Walls").material = wallmaterials.walltexture;
           livingRoomModel.getObjectByName("Tiles").material = livingRoomMtl.hexagonaltiles;
+
+          //low tables
           livingRoomModel.getObjectByName("Cylinder001").material = livingRoomMtl.maplehoney;
           livingRoomModel.getObjectByName("Cylinder043").material = livingRoomMtl.maplehoney;
           
@@ -242,6 +255,9 @@ function init() {
           livingRoomModel.getObjectByName("Box045").material = livingRoomMtl.maplehoney;
           livingRoomModel.getObjectByName("Box039").material = livingRoomMtl.maplehoney;
           livingRoomModel.getObjectByName("Box040").material = livingRoomMtl.maplehoney;
+          livingRoomModel.getObjectByName("Box041").material = livingRoomMtl.maplehoney;
+          livingRoomModel.getObjectByName("Box042").material = livingRoomMtl.maplehoney;
+          livingRoomModel.getObjectByName("Box043").material = livingRoomMtl.maplehoney;
           livingRoomModel.getObjectByName("Box044").material = livingRoomMtl.maplehoney;
         },
         onProgress,
