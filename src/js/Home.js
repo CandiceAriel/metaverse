@@ -9,6 +9,7 @@ import { Clock } from "../../public/js/Clock.js";
 
 const canvas = document.getElementsByClassName("canvas");
 const btnLock = document.getElementsByClassName("btn_lock");
+const dekstopHelp = document.getElementsByClassName("desktop-help");
 
 $( document ).ready(function() {
   $(".icon-close").click(function(ev){
@@ -117,6 +118,19 @@ function init() {
     if (xhr.lengthComputable) {
       const percentComplete = (xhr.loaded / xhr.total) * 100;
       console.log(Math.round(percentComplete, 2) + "% downloaded");
+
+      // if (dekstopHelp.length > 0){
+      //   console.log("Ada")
+      //   if(dekstopHelp[0].style.display === 'none' ){
+      //     dekstopHelp[0].style.display = "block"
+      //   } else {
+      //     dekstopHelp[0].style.display = "none"
+      //   }
+        
+      // } else {
+      //   console.log("None")
+      //   //dekstopHelp.style.display = "none"
+      // }
     }
   };
 
@@ -191,7 +205,7 @@ function init() {
           scene.add(bathroomModel);
           bathroomModel.position.x = camera.position.x + 10;
           bathroomModel.position.y = blockPlane.position.y + 1;
-          bathroomModel.position.z = camera.position.z - 10;
+          bathroomModel.position.z = camera.position.z - 7;
           bathroomModel.scale.set(0.04, 0.04, 0.04);
           bathroomModel.rotateY(Math.PI / 2);
 
@@ -299,21 +313,21 @@ var animate = function () {
 
  
   if ( keys.w )
-    speed = -0.3;
+    speed = -0.2;
   else if ( keys.s )
-    speed = 0.3;
+    speed = 0.2;
 
-  velocity += (speed - velocity) * .3;
+  velocity += (speed - velocity) * .2;
   //cube.translateZ(velocity)
   control.moveForward( - velocity )
   control.minPolarAngle = Math.PI/2;
   control.maxPolarAngle = Math.PI/2;
 
   if ( keys.a ){
-    camera.rotateY (0.2)
+    camera.rotateY (0.1)
 
   }else if ( keys.d ){
-    camera.rotateY(-0.2);
+    camera.rotateY(-0.1);
   }
 
   //camera.lookAt(cube.position)
