@@ -4,6 +4,7 @@
       <div class="canvas"></div>
       <div class="home_content">
         <button class="btn_lock">Pointer Lock</button>
+        <!-- INSTRUCTION CARD -->
         <div class="desktop-help" id="desktopInstruction">
           <div class="desktop-help-header">
             <img id="iconClose" class="icon-close" src = "../assets/Icons/close.png" alt="keys"/>

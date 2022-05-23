@@ -23,13 +23,13 @@ let camera, scene, renderer,mesh, goal, keys, follow;
 let ambientLight, pointLight;
 let clock, control, orbitctrl;
 
-let cube, blockPlane;
+let blockPlane;
 let pointer, raycaster, selectedObj;
 
 //custom obj and materials
-let bathroomModel, bathroomMtl, bathroomMtl2;
+let emptyRoom, bathroomMtl, coffeeTable;
+let showroom1;
 let livingRoomModel, livingRoomMtl;
-let objectCollection;
 
 //material
 let wallmaterials;
@@ -57,15 +57,19 @@ var velocity = 0.0;
 //initialize
 function init() {
   //ADD CAMERA
-  //camera = new THREE.PerspectiveCamera( 90, window.innerWidth / window.innerHeight, 1, 500 );
+  const fov = 75;
+  const aspect = window.innerWidth / window.innerHeight;
+  const near = 1.0;
+  const far = 1000.0;
+
   camera = new THREE.PerspectiveCamera(
-    100,
-    window.innerWidth / window.innerHeight,
-    1,
-    500
+    fov,
+    aspect,
+    near,
+    far
   );
   camera.position.x += (mouseX - camera.position.x) * 0.05;
-  camera.position.y += -0.5;
+  camera.position.y = 0;
   camera.position.z = -10;
   //camera.lookAt (new THREE.Vector3(-4,0,0));
 
@@ -149,26 +153,6 @@ function init() {
   //   });
   // }
 
-  const objLoader2 = new FBXLoader();
-  function loadModel2() {
-    //objLoader2.setMaterials(bathroomMtl2);
-    objLoader2.load(
-      "model/obj/3d-model.fbx",
-      (object) => {
-        scene.add(object);
-        object.position.x = camera.position.x - 10;
-        object.position.y = blockPlane.position.y + 1;
-        object.position.z = camera.position.z - 10;
-        object.scale.set(0.04, 0.04, 0.04);
-        object.rotateY(Math.PI / -2);
-      },
-      onProgress,
-      (error) => {
-        console.log(error);
-      }
-    );
-  }
-
   const mtlLoader = new MTLLoader();
   
   function loadMaterial() {
@@ -204,78 +188,136 @@ function init() {
 
   // load model
   // X cord : left and right
+  const fbxLoader = new FBXLoader();
   const objLoader = new OBJLoader();
+
   function loadModel() {
     //objLoader.setMaterials(bathroomMtl);
-    objectCollection = {
-      //bathroom model
-      bathroom : objLoader.load(
-        "model/obj/3d-model.obj",
-        (object) => {
-          bathroomModel = object;
-          scene.add(bathroomModel);
-          bathroomModel.position.x = camera.position.x + 10;
-          bathroomModel.position.y = blockPlane.position.y + 1;
-          bathroomModel.position.z = camera.position.z - 7;
-          bathroomModel.scale.set(0.04, 0.04, 0.04);
-          bathroomModel.rotateY(Math.PI / 2);
+    var group = new THREE.Group();
+    var objPositionY = blockPlane.position.y + 0.5;
 
-          console.log(bathroomModel);
-          
-        },
-        onProgress,
-        (error) => {
-          console.log(error);
-        }
-      ),
+    //living room
+    objLoader.load(
+      "model/obj/Preview Living Room_OBJ.obj",
+      (object) => {
+        livingRoomModel = object;
+        scene.add(livingRoomModel);
+        livingRoomModel.position.x = camera.position.x;
+        livingRoomModel.position.y = blockPlane.position.y + 1.5;
+        livingRoomModel.position.z = camera.position.z - 25;
+        livingRoomModel.scale.set(0.02, 0.02, 0.02);
+        
+        //object.rotateY(Math.PI / 8);
+        console.log(livingRoomModel);
 
-      //living room model 
-      livingRoom : objLoader.load(
-        "model/obj/Preview Living Room_OBJ.obj",
-        (object) => {
-          livingRoomModel = object;
-          scene.add(livingRoomModel);
-          livingRoomModel.position.x = camera.position.x;
-          livingRoomModel.position.y = blockPlane.position.y + 1.5;
-          livingRoomModel.position.z = camera.position.z - 20;
-          livingRoomModel.scale.set(0.02, 0.02, 0.02);
-          
-          //object.rotateY(Math.PI / 8);
-          console.log(livingRoomModel);
-  
-          //set textures per mesh/object
-          livingRoomModel.getObjectByName("Walls").material = wallmaterials.walltexture;
-          livingRoomModel.getObjectByName("Tiles").material = livingRoomMtl.hexagonaltiles;
+        //set textures per mesh/object
+        livingRoomModel.getObjectByName("Walls").material = wallmaterials.walltexture;
+        livingRoomModel.getObjectByName("Tiles").material = livingRoomMtl.hexagonaltiles;
 
-          //low tables
-          livingRoomModel.getObjectByName("Cylinder001").material = livingRoomMtl.maplehoney;
-          livingRoomModel.getObjectByName("Cylinder043").material = livingRoomMtl.maplehoney;
-          
-          //bookshelf
-          livingRoomModel.getObjectByName("Box045").material = livingRoomMtl.maplehoney;
-          livingRoomModel.getObjectByName("Box039").material = livingRoomMtl.maplehoney;
-          livingRoomModel.getObjectByName("Box040").material = livingRoomMtl.maplehoney;
-          livingRoomModel.getObjectByName("Box041").material = livingRoomMtl.maplehoney;
-          livingRoomModel.getObjectByName("Box042").material = livingRoomMtl.maplehoney;
-          livingRoomModel.getObjectByName("Box043").material = livingRoomMtl.maplehoney;
-          livingRoomModel.getObjectByName("Box044").material = livingRoomMtl.maplehoney;
-        },
-        onProgress,
-        (error) => {
-          console.log(error);
-        }
-      ),
-    }
+        //low tables
+        livingRoomModel.getObjectByName("Cylinder001").material = livingRoomMtl.maplehoney;
+        livingRoomModel.getObjectByName("Cylinder043").material = livingRoomMtl.maplehoney;
+        
+        //bookshelf
+        livingRoomModel.getObjectByName("Box045").material = livingRoomMtl.maplehoney;
+        livingRoomModel.getObjectByName("Box039").material = livingRoomMtl.maplehoney;
+        livingRoomModel.getObjectByName("Box040").material = livingRoomMtl.maplehoney;
+        livingRoomModel.getObjectByName("Box041").material = livingRoomMtl.maplehoney;
+        livingRoomModel.getObjectByName("Box042").material = livingRoomMtl.maplehoney;
+        livingRoomModel.getObjectByName("Box043").material = livingRoomMtl.maplehoney;
+        livingRoomModel.getObjectByName("Box044").material = livingRoomMtl.maplehoney;
+      },
+      onProgress,
+      (error) => {
+        console.log(error);
+      }
+    );
+    //
+
+    //billboard
+    objLoader.load(
+      "model/obj/emptyroom.obj",
+      (object) => {
+        emptyRoom = object;
+        emptyRoom.position.x = camera.position.x - 15;
+        emptyRoom.position.y = objPositionY ;
+        emptyRoom.position.z = camera.position.z - 3;
+        
+        // Scale(X, Y, Z)
+        emptyRoom.scale.set(1, 1, 1);
+
+        emptyRoom.rotateY(Math.PI / 2);
+        
+        scene.add(emptyRoom);
+        
+      },
+      onProgress,
+      (error) => {
+        console.log(error);
+      }
+    );
+
+    //glassroom
+    objLoader.load(
+      "model/obj/emptyroom.obj",
+      (object) => {
+        showroom1 = object;
+        object.position.x = camera.position.x - 15;
+        object.position.y = objPositionY ;
+        object.position.z = emptyRoom.position.z - 15;
+        
+        // Scale(X, Y, Z)
+        object.scale.set(1, 1, 1);
+
+        object.rotateY(Math.PI / 2);
+
+        const newMaterial = object.getObjectByName("wall_4_Cube.005").material.clone();
+        newMaterial.transparent = true;
+        newMaterial.opacity = 0.5;
+        object.getObjectByName("wall_4_Cube.005").material = newMaterial;
+
+        group.add(showroom1);
+        scene.add(group);
+        
+      },
+      onProgress,
+      (error) => {
+        console.log(error);
+      }
+    );
+
+    //coffee table
+    objLoader.load(
+      "model/obj/SillaCoffeeTable.obj",
+      (object) => {
+        coffeeTable = object;
+
+        coffeeTable.position.x = showroom1.position.x + 1;
+        coffeeTable.position.y = blockPlane.position.y + 1.5 ;
+        coffeeTable.position.z = showroom1.position.z;
+        // Scale(X, Y, Z)
+        object.scale.set(0.025, 0.025, 0.025);
+
+        group.add(coffeeTable);
+        
+      },
+      onProgress,
+      (error) => {
+        console.log(error);
+      }
+    );
+
   }
 
   function createFloor() {
-    let pos = { x: 0, y: -4, z: 3 };
+    let pos = { x: 0, y: -5, z: 3 };
     let scale = { x: 2000, y: 2, z: 2000 };
 
     blockPlane = new THREE.Mesh(
       new THREE.BoxBufferGeometry(),
       new THREE.MeshPhongMaterial({ material: livingRoomMtl.maplehoney })
     );
+
     blockPlane.position.set(pos.x, pos.y, pos.z);
     blockPlane.scale.set(scale.x, scale.y, scale.z);
     blockPlane.castShadow = true;
