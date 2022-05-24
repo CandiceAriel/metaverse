@@ -10,6 +10,8 @@ import { Clock } from "../../public/js/Clock.js";
 const canvas = document.getElementsByClassName("canvas");
 const btnLock = document.getElementsByClassName("btn_lock");
 const dekstopHelp = document.getElementsByClassName("desktop-help");
+const objectDescription = document.getElementById("tip");
+
 
 $( document ).ready(function() {
   $(".icon-close").click(function(ev){
@@ -52,7 +54,6 @@ var a = new THREE.Vector3;
 var b = new THREE.Vector3;
 var coronaSafetyDistance = 0.3;
 var velocity = 0.0;
-// var speed = 0.0;
 
 //initialize
 function init() {
@@ -232,7 +233,7 @@ function init() {
         console.log(error);
       }
     );
-    //
+    //y
 
     //billboard
     objLoader.load(
@@ -274,7 +275,8 @@ function init() {
         const newMaterial = object.getObjectByName("wall_4_Cube.005").material.clone();
         newMaterial.transparent = true;
         newMaterial.opacity = 0.5;
-        object.getObjectByName("wall_4_Cube.005").material = newMaterial;
+        var removedObj = object.getObjectByName("wall_4_Cube.005");
+        removedObj.parent.remove( removedObj );
 
         group.add(showroom1);
         scene.add(group);
@@ -287,6 +289,7 @@ function init() {
     );
 
     //coffee table
+    var sillaGroup = new THREE.Group();
     objLoader.load(
       "model/obj/SillaCoffeeTable.obj",
       (object) => {
@@ -297,8 +300,11 @@ function init() {
         coffeeTable.position.z = showroom1.position.z;
         // Scale(X, Y, Z)
         object.scale.set(0.025, 0.025, 0.025);
+        coffeeTable.parent = sillaGroup;
+        sillaGroup.add(coffeeTable);
+        sillaGroup.name = "Silla Coffee Table"
 
-        group.add(coffeeTable);
+        group.add(sillaGroup);
         
       },
       onProgress,
@@ -404,6 +410,15 @@ var animate = function () {
   render();
 }
 
+// function positionTip(pos3D) {
+
+//   var v = pos3D.project(camera);
+//   var left = window.innerWidth * (v.x + 1) / 2;
+//   var top = window.innerHeight * (-v.y + 1) / 2;
+
+//   $('#tip').css({ left: left, top: top });
+// }
+
 //--------
 //EVENT HANDLERS
 function onWindowResize() {
@@ -455,12 +470,19 @@ function onPointerMove( event ) {
 function onClickEvent( event ){
   raycaster.setFromCamera( pointer, camera );
 
+  // raycast
+  // var vector = new THREE.Vector3(pointer.x, pointer.y, 0.5).unproject(camera);
+  // var raycaster = new THREE.Raycaster(camera.position, vector.sub(camera.position).normalize());
+
 	// calculate objects intersecting the picking ray
 	const intersects = raycaster.intersectObjects( scene.children );
 
   if ( intersects.length > 0 ) {
-    selectedObj = intersects[ 0 ].object
-   
+    selectedObj = intersects[ 0 ].object;
+
+    // toggle html element
+    $('#tip').css('display', 'block');
+    $('#tip').text(selectedObj.parent.parent.name);
   }
   console.log(selectedObj);
 }

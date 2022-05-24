@@ -20,6 +20,7 @@
             <p> <strong>D</strong> : rotate right </p>
           </div>
         </div>
+        <div id="tip" class="description-card" style="position: absolute; display: none">Some text</div>
       </div>
     </div>
   </div>
